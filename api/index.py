@@ -65,24 +65,50 @@ def fetch_email():
                 if body:
                     result = process_message(body)
                     if result["status"] == "success":
-                        send_to_webhook(result["data"])
-
-                # Return processed message (if needed)
-                return {
-                    "status": "success",
-                    "subject": subject,
-                    "from": from_,
-                    "body": body,
-                }
+                    # Return processed message (if needed)
+                        return {
+                            "status": "success",
+                            "subject": subject,
+                            "from": from_,
+                            "body": body,
+                        }
+                    else
+                        return {
+                            "status": "failed",
+                            "subject": subject,
+                            "from": from_,
+                            "body": body,
+                        }
 
         mail.logout()
     except Exception as e:
         return {"status": "error", "message": str(e)}
-
+def get_account_balance(self,token, account):
+        headers = {
+            'Accept': 'application/json',
+            'auth-token': token 
+        }
+        
+        try:
+            get_balance_url=f"https://mt-client-api-v1.london.agiliumtrade.ai/users/current/accounts/{account}/account-information"
+            response = requests.get(get_balance_url, headers=headers)
+            
+            # Check if request was successful
+            if response.status_code == 200:
+                data = response.json()
+                return data.get('balance')  
+            else:
+                print(f"Error: API request for get balance failed with status code {response.status_code}")
+                print(response) 
+                return None
+                
+        except Exception as e:
+            print(f"Error fetching balance: {str(e)}")
+            return None
 def process_message(body):
     try:
         # Split the body by space
-        message_parts = body.split()
+        message_parts = body.split(" ")
         if len(message_parts) < 4:
             return {"status": "error", "message": "Invalid message format"}
 
@@ -90,33 +116,56 @@ def process_message(body):
         act_type = "ORDER_TYPE_SELL" if message_parts[0] == "SELL" else "ORDER_TYPE_BUY"
 
         # Extract the remaining data
-        marubozu_type = message_parts[1]  # Example: "MARUBOZU"
-        price = message_parts[2]  # Example: "0.0031"
-        volume = message_parts[3]  # Example: "301"
+        //marubozu_type = message_parts[1]  # Example: "MARUBOZU"
+        price = message_parts[3]  # Example: "0.0031"
+        volume = message_parts[2]  # Example: "301"
 
-        # Create the JSON message to send to the webhook
-        json_data = {
-            "action_type": act_type,
-            "marubozu_type": marubozu_type,
-            "price": price,
-            "volume": volume
+        # accountName=received_json.get('account')
+        accountStr=f'ACCOUNT_ID'
+        tokenStr=f'METAAPI_TOKEN'
+        account=os.getenv(accountStr)
+        token=os.getenv(tokenStr)
+        # a=0
+        # if accountName=="masnur":
+        #     if symbol[-1]!='m' :
+        #         symbol=f'{symbol}m'
+        #     a=1
+        # else:
+        #     if symbol[-1]=='m' :
+        #         symbol=symbol[0:-1]
+        balance=self.get_account_balance(token, account)
+        # Define the API endpoint where you want to forward the request
+        forward_url = f"https://mt-client-api-v1.london.agiliumtrade.ai/users/current/accounts/{account}/trade"  # Replace with your actual API endpoint
+        balance2= float(balance) 
+        buy_json={
+            "symbol": "XAUUSDm",
+            "actionType": act_type,
+            "volume": round(volume*balance2, 2),
+            "stopLoss": 0,
+            "takeProfit": float(price),
+            "takeProfitUnits": "RELATIVE_POINTS"
         }
+        
+        headers = {
+            'Accept': 'application/json',
+            'auth-token':token,
+            'Content-Type':'application/json'
+            # Add any other required headers here
+        }
+        
+        response = requests.post(
+            forward_url,
+            json=buy_json,
+            headers=headers
+        )
+        # Create the JSON message to send to the webhook
 
-        return {"status": "success", "data": json_data}
+
+        return {"status": "success", "data": buy_data}
 
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
-def send_to_webhook(data):
-    try:
-        # Send the data to the specified webhook URL
-        response = requests.post(WEBHOOK_URL, json=data)
-        if response.status_code == 200:
-            print("Data sent to webhook successfully.")
-        else:
-            print(f"Failed to send data: {response.status_code}")
-    except Exception as e:
-        print(f"Error sending data to webhook: {str(e)}")
 
 @app.route("/api/check-email", methods=["GET"])
 def check_email():
