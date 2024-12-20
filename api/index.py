@@ -84,7 +84,7 @@ class handler(BaseHTTPRequestHandler):
             buy_json={
                 "symbol": "XAUUSDm",
                 "actionType": actType,
-                "volume": round(lot*balance2, 2),
+                "volume": round(float(lot)*balance2, 2),
                 "stopLoss": 0,
                 "takeProfit": float(tp),
                 "takeProfitUnits": "RELATIVE_POINTS"
