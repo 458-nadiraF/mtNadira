@@ -59,11 +59,12 @@ class handler(BaseHTTPRequestHandler):
             received_json = json.loads(post_data)
             print(received_json)
             #received_json = json.loads(post_data.decode('utf-8'))
-            lot=received_json.get('lot')
-            sl=received_json.get('sl')
-            tp=received_json.get('tp')
-            symbol=received_json.get('Symbol')
-            add=received_json.get('add')
+            message=received_json.get('plain')
+            messageSplit=message.split()
+            lot=messageSplit[2]
+            action=messageSplit[0]
+            tp=messageSplit[3]
+            
             # accountName=received_json.get('account')
             accountStr=f'ACCOUNT_ID'
             tokenStr=f'METAAPI_TOKEN'
@@ -82,18 +83,18 @@ class handler(BaseHTTPRequestHandler):
             forward_url = f"https://mt-client-api-v1.london.agiliumtrade.ai/users/current/accounts/{account}/trade"  # Replace with your actual API endpoint
             balance2= float(balance) 
             actType=""
-            if(add=="buy"):
+            if(action=="BUY"):
                 actType="ORDER_TYPE_BUY"
                 
-            elif(add=='sell') :
+            elif(action=='SELL') :
                 actType="ORDER_TYPE_SELL"
             buy_json={
-                "symbol": symbol,
+                "symbol": "XAUUSDm",
                 "actionType": actType,
                 "volume": round(lot*balance2, 2),
-                "stopLoss": sl,
+                "stopLoss": 0,
                 "takeProfit": float(tp),
-                "takeProfitUnits": "ABSOLUTE_PRICE"
+                "takeProfitUnits": "RELATIVE_POINTS"
             }
             
             headers = {
@@ -126,7 +127,7 @@ class handler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps(response_data).encode())
            
             log_message = (
-                f" MTReal1. Execution Duration: {execution_duration}ms\n"
+                f" MTNadira. Execution Duration: {execution_duration}ms\n"
                 f"Response Content: {response_data}\n"
                 "-------------------------------------------\n"
             )
