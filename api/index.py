@@ -88,7 +88,8 @@ class handler(BaseHTTPRequestHandler):
                 "stopLoss": 0.4,
                 "takeProfit": float(tp),
                 "takeProfitUnits": "RELATIVE_POINTS",
-                "stopLossUnits":"RELATIVE_BALANCE_PERCENTAGE"
+                "stopLossUnits":"RELATIVE_BALANCE_PERCENTAGE",
+                "comment":f"{messageSplit[0:1]}"
             }
             
             headers = {
