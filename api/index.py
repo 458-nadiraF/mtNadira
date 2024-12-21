@@ -85,9 +85,10 @@ class handler(BaseHTTPRequestHandler):
                 "symbol": "XAUUSDm",
                 "actionType": actType,
                 "volume": round(float(lot)*balance2, 2),
-                "stopLoss": 0,
+                "stopLoss": 0.4,
                 "takeProfit": float(tp),
-                "takeProfitUnits": "RELATIVE_POINTS"
+                "takeProfitUnits": "RELATIVE_POINTS",
+                "stopLossUnits":"RELATIVE_BALANCE_PERCENTAGE"
             }
             
             headers = {
