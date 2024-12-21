@@ -144,7 +144,7 @@ class handler(BaseHTTPRequestHandler):
             
         except Exception as e:
             # Handle any errors
-            self.send_response(500)
+            self.send_response(400)
             self.send_header('Content-Type', 'application/json')
             self.end_headers()
             error_response = {
