@@ -54,9 +54,9 @@ class handler(BaseHTTPRequestHandler):
             #received_json = json.loads(post_data.decode('utf-8'))
             message=received_json.get('plain')
             messageSplit=message.split()
-            lot=messageSplit[2]
+            closePrice=messageSplit[2]
             action=messageSplit[0]
-            tp=messageSplit[3]
+            jenis=messageSplit[1]
             
             # accountName=received_json.get('account')
             accountStr=f'ACCOUNT_ID'
@@ -76,15 +76,17 @@ class handler(BaseHTTPRequestHandler):
             forward_url = f"https://mt-client-api-v1.london.agiliumtrade.ai/users/current/accounts/{account}/trade"  # Replace with your actual API endpoint
             balance2= float(balance) 
             actType=""
+            lot=float(100/closePrice)
+            tp=round(closePrice,0)
             if(action=="BUY"):
                 actType="ORDER_TYPE_BUY"
                 
-            elif(action=='SELL') :
+            elif(action=="SELL") :
                 actType="ORDER_TYPE_SELL"
             buy_json={
                 "symbol": "XAUUSDm",
                 "actionType": actType,
-                "volume": round(float(lot)*balance2, 2),
+                "volume": round(float(lot*balance2), 2),
                 "stopLoss": 0.4,
                 "takeProfit": float(tp),
                 "takeProfitUnits": "RELATIVE_POINTS",
