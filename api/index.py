@@ -76,8 +76,8 @@ class handler(BaseHTTPRequestHandler):
             forward_url = f"https://mt-client-api-v1.london.agiliumtrade.ai/users/current/accounts/{account}/trade"  # Replace with your actual API endpoint
             balance2= float(balance) 
             actType=""
-            lot=float(100/closePrice)
-            tp=round(closePrice,0)
+            lot=float(0.6*balance2/closePrice*0.4)
+            tp=round(closePrice*1.013,0)
             if(action=="BUY"):
                 actType="ORDER_TYPE_BUY"
                 
@@ -86,8 +86,8 @@ class handler(BaseHTTPRequestHandler):
             buy_json={
                 "symbol": "XAUUSDm",
                 "actionType": actType,
-                "volume": round(float(lot*balance2), 2),
-                "stopLoss": 0.4,
+                "volume": round(float(lot), 2),
+                "stopLoss": 0.6,
                 "takeProfit": float(tp),
                 "takeProfitUnits": "RELATIVE_POINTS",
                 "stopLossUnits":"RELATIVE_BALANCE_PERCENTAGE",
