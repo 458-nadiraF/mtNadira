@@ -54,7 +54,7 @@ class handler(BaseHTTPRequestHandler):
             #received_json = json.loads(post_data.decode('utf-8'))
             message=received_json.get('plain')
             messageSplit=message.split()
-            closePrice=messageSplit[2]
+            closePrice=float(messageSplit[2].split('\n')[0])
             action=messageSplit[0]
             jenis=messageSplit[1]
             
