@@ -143,6 +143,19 @@ class handler(BaseHTTPRequestHandler):
             else:
                 print(f"Error: API request for placing order failed with status code {response.status_code}")
                 return None
+            tele_url=os.getenv('TELEGRAM_API')
+            timestamp=timestamp = time.strftime("%m/%d/%Y %H:%M:%S", time.localtime())
+            # Define the API endpoint where you want to forward the request
+            textContent=f"Alert Screener A01:Any alert() function call \n{log_message}"
+            params={
+               "chat_id": f"{os.getenv('CHAT_ID')}",
+               "text": textContent
+            }
+            
+            response = requests.post(
+                tele_url,
+                params=params
+            )
             
         except Exception as e:
             # Handle any errors
